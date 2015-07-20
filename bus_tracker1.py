@@ -5,6 +5,16 @@ import re
 import time
 import urllib.request
 
+class StatusMessage:
+    """Status messages to display and read out loud to the user."""
+    msg = ""
+    def add(self, m):
+        self.msg = self.msg + m + "\n"
+    def read_out(self):
+        print(self.msg)
+        os.system("say '" + self.msg + "'")
+        self.msg = ""
+
 def stop_data_fetch(bus_name, stop_num):
     """Fetch NextBus data for the line and stop number."""
     utf_decoder = codecs.getreader("utf-8")
@@ -16,7 +26,7 @@ def prediction_extract(data):
     """Extract the next three prediction times from the JSON data."""
     next_times = []
     for p in data[0]['values']:
-        if p['minutes'] > 90:
+        if p['minutes'] > 60:
             break
         next_times.append(p['minutes'])
     return next_times
@@ -37,11 +47,13 @@ def say(line):
 
 def read_out_times():
     """Give the user an update on the current time predictions."""
+    status = StatusMessage()
     data_F = speech_format(prediction_extract(stop_data_fetch('F', '0304910')))
     data_18 = speech_format(prediction_extract(stop_data_fetch('18', '0304910')))
 
-    say("The F bus is coming in " + data_F)
-    say("You could also take the 18 bus coming in " + data_18)
+    status.add("The F bus is coming in " + data_F)
+    status.add("You could also take the 18 bus coming in " + data_18)
+    status.read_out()
 
 def main():
     """Read out bus time predictions every 5 minutes."""
