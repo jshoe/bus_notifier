@@ -37,13 +37,9 @@ def speech_format(next_times):
     for t in next_times:
         line += (str(t) + ", ")
     line += " minutes."
-    line = re.sub(', ([0-9]+),  ', ', and \g<1> ', line)
+    line = re.sub(', ([0-9]+),  ', ', and \g<1> ', line) # Fix up extra commas.
+    line = re.sub('(^[0-9]+), and', '\g<1> and', line) # Remove extra comma with only two
     return line
-
-def say(line):
-    """Give the lines to the OS to say."""
-    print(line)
-    os.system("say " + line)
 
 def read_out_times():
     """Give the user an update on the current time predictions."""
